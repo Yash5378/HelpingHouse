@@ -1,0 +1,1 @@
+ALTER TABLE "helpingHouse" ADD COLUMN "is_approved" boolean DEFAULT false;

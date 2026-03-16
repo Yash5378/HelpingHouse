@@ -1,0 +1,1 @@
+ALTER TABLE "helpingHouse" ALTER COLUMN "address" SET DATA TYPE varchar(225);

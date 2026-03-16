@@ -1,0 +1,1 @@
+ALTER TABLE "helpingHouse" ADD COLUMN "ngo_type" varchar(100) NOT NULL;

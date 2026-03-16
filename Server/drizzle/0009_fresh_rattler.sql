@@ -1,0 +1,1 @@
+ALTER TABLE "helpingHouse" ALTER COLUMN "ngo_certificate_url" DROP NOT NULL;

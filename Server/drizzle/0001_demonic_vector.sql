@@ -1,0 +1,1 @@
+ALTER TABLE "helpingHouse" DROP COLUMN "location";
