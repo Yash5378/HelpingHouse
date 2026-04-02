@@ -1,0 +1,1 @@
+ALTER TABLE "helpingHouse" ADD COLUMN "description" varchar(500);

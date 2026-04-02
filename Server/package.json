@@ -20,7 +20,7 @@
     "drizzle-kit": "^0.31.8",
     "drizzle-orm": "^0.45.1",
     "express": "^5.2.1",
-    "firebase": "^12.10.0",
+    "firebase": "^10.14.1",
     "firebase-admin": "^13.6.1",
     "firebaseui": "^6.1.0",
     "jsonwebtoken": "^9.0.3",

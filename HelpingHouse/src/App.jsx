@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ConfigProvider, Layout } from "antd";
 
 import Login from "./components/login";
@@ -15,6 +10,8 @@ import DemoDashboard from "./components/DemoDashboard";
 import Home from "./components/Home";
 import LandingPage from "./components/LandingPage";
 import RouteProtection from "./GenericComponent/RouteProtection";
+import HelpingHouse from "./components/HelpingHouse";
+import TokenExpiryHandler from "./components/TokenExpiryHandler";
 
 const { Content } = Layout;
 
@@ -32,11 +29,11 @@ const antdTheme = {
   },
 };
 
-
 export default function App() {
   return (
     <ConfigProvider theme={antdTheme}>
       <BrowserRouter>
+        <TokenExpiryHandler />
         <Layout>
           <HeaderComponent />
           <Content>
@@ -50,6 +47,7 @@ export default function App() {
               <Route element={<RouteProtection />}>
                 <Route path="/home" element={<Home />} />
                 <Route path="/dashboard" element={<HelpingHouseDashboard />} />
+                <Route path="/:id" element={<HelpingHouse />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/login" replace />} />

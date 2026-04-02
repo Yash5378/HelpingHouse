@@ -1,9 +1,11 @@
 import { db } from "../db/DbConnection.js";
 import { doner } from "../db/schema/donerSchema.js";
 import { helpingHouse } from "../db/schema/helpingHouseSchema.js";
+import { helpingHousePerson } from "../db/schema/helpingHousePerson.js";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import admin from "../config/firebase.js";
 
 /**
  * Unified sign-in function for both doners and helping houses
@@ -53,8 +55,17 @@ export const unifiedSignin = async ({ email, password }) => {
         email: user.email,
       },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      { expiresIn: process.env.JWT_EXPIRES_IN },
     );
+
+    // Retrieve helping house persons when login is helping house
+    let helpingHousePersons = [];
+    if (userType === "helping_house") {
+      helpingHousePersons = await db
+        .select()
+        .from(helpingHousePerson)
+        .where(eq(helpingHousePerson.helpingHouseId, user.id));
+    }
 
     // Return user data (excluding sensitive information)
     const userData = {
@@ -69,6 +80,7 @@ export const unifiedSignin = async ({ email, password }) => {
         ngoType: user.ngoType,
         isActive: user.isActive,
         isApproved: user.isApproved,
+        helpingHousePersons,
       }),
     };
 
@@ -83,6 +95,134 @@ export const unifiedSignin = async ({ email, password }) => {
       throw new Error("Database connection error. Please try again later.");
     }
     throw error;
+  }
+};
+
+export const unifiedOAuthSignin = async (token) => {
+  try {
+    if (!admin) {
+      throw new Error("Firebase Admin SDK not initialized");
+    }
+
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const { email, name, uid } = decodedToken;
+
+    if (!email) {
+      throw new Error("Invalid Google token: missing email");
+    }
+
+    let [user] = await db.select().from(doner).where(eq(doner.email, email));
+    let userType = "doner";
+    let helpingHousePersons = [];
+
+    if (!user) {
+      [user] = await db
+        .select()
+        .from(helpingHouse)
+        .where(eq(helpingHouse.email, email));
+      userType = "helping_house";
+    }
+
+    if (!user) {
+      [user] = await db
+        .insert(doner)
+        .values({
+          name: name || "Google User",
+          email,
+          firebaseUid: uid,
+          authProvider: "firebase",
+          isActive: true,
+        })
+        .returning();
+    } else if (userType === "doner" && !user.firebaseUid) {
+      [user] = await db
+        .update(doner)
+        .set({ firebaseUid: uid, authProvider: "firebase" })
+        .where(eq(doner.id, user.id))
+        .returning();
+    }
+
+    if (userType === "helping_house") {
+      helpingHousePersons = await db
+        .select()
+        .from(helpingHousePerson)
+        .where(eq(helpingHousePerson.helpingHouseId, user.id));
+    }
+
+    const jwtToken = jwt.sign(
+      {
+        id: user.id,
+        role: userType,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN },
+    );
+
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: userType,
+      ...(userType === "helping_house" && {
+        address: user.address,
+        phone: user.phone,
+        website: user.website,
+        ngoType: user.ngoType,
+        isActive: user.isActive,
+        isApproved: user.isApproved,
+        helpingHousePersons,
+      }),
+    };
+
+    return {
+      token: jwtToken,
+      user: userData,
+      userType,
+    };
+  } catch (error) {
+    if (error.code === "ECONNREFUSED" || error.message?.includes("connect")) {
+      throw new Error("Database connection error. Please try again later.");
+    }
+    throw error;
+  }
+};
+
+export const unifiedOAuthSigninHandler = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        error: "Google token is required",
+        message: "Please provide a valid Google authentication token.",
+      });
+    }
+
+    const result = await unifiedOAuthSignin(token);
+
+    res.status(200).json({
+      success: true,
+      token: result.token,
+      user: result.user,
+      userType: result.userType,
+      message: "Login successful",
+      status_code: 200,
+    });
+  } catch (error) {
+    console.error("Unified OAuth sign-in error:", error);
+
+    if (error.message === "Invalid Google token: missing email") {
+      return res.status(400).json({
+        error: "Invalid Google token",
+        message: "Could not validate Google sign-in token.",
+      });
+    }
+
+    res.status(500).json({
+      error: "OAuth Login failed",
+      message: error.message || "An error occurred during Google login",
+    });
   }
 };
 

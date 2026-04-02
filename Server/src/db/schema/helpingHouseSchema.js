@@ -18,5 +18,7 @@ export const helpingHouse = pgTable("helpingHouse", {
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   ngoType: varchar("ngo_type", { length: 100 }).notNull(),
+  ngoName: varchar("ngo_name", { length: 100 }),
   isApproved: boolean("is_approved").default(false),
+  description: varchar("description", { length: 500 }),
 });

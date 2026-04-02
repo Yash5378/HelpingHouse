@@ -1,0 +1,1 @@
+ALTER TABLE "helpingHouse" ALTER COLUMN "ngo_name" SET NOT NULL;

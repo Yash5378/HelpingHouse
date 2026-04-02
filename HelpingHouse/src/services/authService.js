@@ -16,8 +16,10 @@ const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "your-api-key",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "your-auth-domain",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "your-project-id",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "your-storage-bucket",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "your-sender-id",
+  storageBucket:
+    import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "your-storage-bucket",
+  messagingSenderId:
+    import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "your-sender-id",
   appId: import.meta.env.VITE_FIREBASE_APP_ID || "your-app-id",
 };
 
@@ -27,7 +29,10 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 // ── API Base URL ──────────────────────────────────────────────
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_BASE_URL ||
+  "http://localhost:3000";
 
 // ─────────────────────────────────────────────────────────────
 
@@ -49,7 +54,8 @@ export const registerDonor = async (userData) => {
     });
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.error || error.message || "Registration failed";
+    const errorMessage =
+      error.response?.data?.error || error.message || "Registration failed";
     throw new Error(errorMessage);
   }
 };
@@ -66,21 +72,25 @@ export const registerDonor = async (userData) => {
  */
 export const registerHelpingHouse = async (userData) => {
   try {
-
-    console.log("userData",userData)
-    const response = await axios.post(`${API_BASE_URL}/api/helping_house/signup`, {
-      name: userData.fullName,
-      email: userData.email,
-      phone: userData.phone,
-      address: userData.address,
-      password: userData.password,
-      ngoType:userData.ngoType,
-      website:userData.website
-    });
+    console.log("userData", userData);
+    const response = await axios.post(
+      `${API_BASE_URL}/api/helping_house/signup`,
+      {
+        name: userData.fullName,
+        email: userData.email,
+        phone: userData.phone,
+        address: userData.address,
+        password: userData.password,
+        ngoType: userData.ngoType,
+        website: userData.website,
+        ngoName: userData.ngoName,
+      },
+    );
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.error || error.message || "Registration failed";
-    throw new Error(errorMessage);
+    const errorMessage =
+      error.response?.data?.error || error.message || "Registration failed";
+    return error.response?.data || { error: errorMessage };
   }
 };
 
@@ -92,16 +102,21 @@ export const loginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const idToken = await result.user.getIdToken();
-    const response = await axios.post(`${API_BASE_URL}/oauth_doner`, {
+    const response = await axios.post(`${API_BASE_URL}/oauth`, {
       token: idToken,
     });
-    
+
+    if (response.data?.token) {
+      localStorage.setItem("userData", JSON.stringify(response.data));
+    }
+
     return response.data;
   } catch (error) {
     if (error.code === "auth/popup-closed-by-user") {
       throw new Error("Sign-in cancelled");
     }
-    const errorMessage = error.response?.data?.error || error.message || "Google sign-in failed";
+    const errorMessage =
+      error.response?.data?.error || error.message || "Google sign-in failed";
     throw new Error(errorMessage);
   }
 };

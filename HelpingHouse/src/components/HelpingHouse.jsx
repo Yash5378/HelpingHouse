@@ -26,7 +26,6 @@ import {
   Dropdown,
   notification,
   Modal,
-  message,
 } from "antd";
 import {
   EnvironmentOutlined,
@@ -62,15 +61,10 @@ import {
   StarFilled,
   ShareAltOutlined,
   DownloadOutlined,
-  DeleteOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  CreatePerson,
-  DeletePerson,
-  GetHelpingHouseDashboard,
-  EditHelpingHouse,
-} from "../Store/HelipngHouse/HelpingHouseAction";
+import { GetHelpingHouseById } from "../Store/HelipngHouse/HelpingHouseAction";
+import { useParams } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text, Paragraph, Link } = Typography;
@@ -221,139 +215,39 @@ const donorColumns = [
   },
 ];
 
-function HelpingHouseDashboard() {
+function HelpingHouse() {
   const [collapsed, setCollapsed] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [selectedKey, setSelectedKey] = useState("2");
   const [modalOpen, setModalOpen] = useState(false);
-  const [personModalOpen, setPersonModalOpen] = useState(false);
-  const [persons, setPersons] = useState([]);
-  const [personForm] = Form.useForm();
-  const [editProfileForm] = Form.useForm();
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
+  const id = useParams().id;
+  console.log("id", id);
 
-  console.log("persons", persons);
+  const getHelpingHouseByIdData = useSelector(
+    (state) => state?.helpingHouse?.getHelpingHouseByIdData,
+  );
+
+  console.log("getHelpingHouseByIdData", getHelpingHouseByIdData);
 
   const userData = JSON.parse(localStorage.getItem("userData")) || {};
+  const storedAuthToken = localStorage.getItem("authToken");
+  const accessToken = userData?.token || storedAuthToken;
   console.log("userData", userData);
+  console.log("accessToken", accessToken);
+
+  useEffect(() => {
+    if (accessToken && id) {
+      dispatch(GetHelpingHouseById(accessToken, id));
+    }
+  }, [accessToken, id, dispatch]);
 
   const openNotif = () => {
     notification.success({
       message: "Action Successful",
       description: "Your changes have been saved.",
       placement: "topRight",
-    });
-  };
-  const accessToken = userData?.token;
-
-  const getHelpingHouseDashboardData = useSelector(
-    (state) => state?.helpingHouse?.getHelpingHouseDashboardData,
-  );
-
-  console.log("getHelpingHouseDashboardData", getHelpingHouseDashboardData);
-  useEffect(() => {
-    if (accessToken) {
-      dispatch(GetHelpingHouseDashboard(accessToken, userData?.user?.id));
-    }
-  }, [accessToken, dispatch]);
-
-  useEffect(() => {
-    if (getHelpingHouseDashboardData?.data?.persons) {
-      setPersons(getHelpingHouseDashboardData.data.persons);
-    }
-  }, [getHelpingHouseDashboardData]);
-
-  const handleSubmitPerson = async () => {
-    console.log("Submitting person with values:", personForm.getFieldsValue());
-    const personData = {
-      ...personForm.getFieldsValue(),
-      helpingHouseId: userData?.user?.id,
-    };
-    console.log("Dispatching CreatePerson with data:", personData);
-    const response = await dispatch(CreatePerson(accessToken, personData));
-    console.log("CreatePerson response:", response);
-    if (response?.status_code === 201) {
-      message.success("Person added successfully!");
-      setPersonModalOpen(false);
-      dispatch(GetHelpingHouseDashboard(accessToken, userData?.user?.id));
-    }
-  };
-
-  const handleUpdateProfile = async () => {
-    try {
-      const values = await editProfileForm.validateFields();
-      const payload = {
-        name: values.name,
-        ngoName: values.ngoName,
-        phone: values.phone,
-        email: values.email,
-        address: values.address,
-        website: values.website,
-        ngoType: values.ngoType,
-        isActive: values.status === "active",
-        description: values.description,
-      };
-
-      const response = await dispatch(
-        EditHelpingHouse(accessToken, userData?.user?.id, payload),
-      );
-
-      if (response?.status_code === 200) {
-        message.success(response?.message || "Profile updated successfully");
-        setModalOpen(false);
-        dispatch(GetHelpingHouseDashboard(accessToken, userData?.user?.id));
-      } else {
-        message.error(response?.error || "Failed to update profile");
-      }
-    } catch (error) {
-      console.error("Edit profile error:", error);
-      message.error("Please fill all required profile fields");
-    }
-  };
-
-  useEffect(() => {
-    const profile = getHelpingHouseDashboardData?.data?.profile;
-    if (modalOpen && profile) {
-      editProfileForm.setFieldsValue({
-        name: profile.name,
-        ngoName: profile.ngoName,
-        description: profile.description,
-        phone: profile.phone,
-        email: profile.email,
-        address: profile.address,
-        website: profile.website,
-        ngoType: profile.ngoType,
-        status: profile.isActive ? "active" : "inactive",
-      });
-    }
-  }, [modalOpen, getHelpingHouseDashboardData, editProfileForm]);
-
-  const handleDeletePerson = (personId) => {
-    Modal.confirm({
-      title: "Are you sure?",
-      content: "Do you really want to delete this person?",
-      okText: "Yes, Delete",
-      okType: "danger",
-      cancelText: "Cancel",
-
-      onOk: async () => {
-        try {
-          console.log("Deleting person with ID:", personId);
-
-          const response = await dispatch(DeletePerson(accessToken, personId));
-
-          console.log("DeletePerson response:", response);
-
-          if (response?.status_code === 200) {
-            message.success("Person deleted successfully!");
-
-            dispatch(GetHelpingHouseDashboard(accessToken, userData?.user?.id));
-          }
-        } catch (error) {
-          message.error("Failed to delete person. Please try again.");
-        }
-      },
     });
   };
 
@@ -521,46 +415,20 @@ function HelpingHouseDashboard() {
                           fontSize: 28,
                         }}
                       >
-                        {getHelpingHouseDashboardData?.data?.profile?.ngoName ||
-                          ""}
+                        {userData.ngoName || ""}
                       </Title>
                       <Space style={{ marginTop: 4 }}>
                         <Text style={{ color: "#64748b" }}>
                           Guiding light for a better future
                         </Text>
                         <Tag color="blue">NGO</Tag>
-                        {getHelpingHouseDashboardData?.data?.profile
-                          ?.isApproved === true ? (
+                        {getHelpingHouseByIdData?.isApproved === true? (
                           <Tag color="green">Verified</Tag>
-                        ) : (
-                          <Tag color="orange">Unverified</Tag>
-                        )}
+                        ):
+                        <Tag color="orange">Unverified</Tag>
+                        }
                       </Space>
                     </div>
-                    <Space>
-                      {/* <Button
-                        icon={<ShareAltOutlined />}
-                        style={{
-                          borderRadius: 8,
-                          borderColor: "#dbeafe", 
-                          color: "#3b82f6",
-                        }}
-                      >
-                        Share
-                      </Button> */}
-                      <Button
-                        type="primary"
-                        icon={<EditOutlined />}
-                        style={{
-                          borderRadius: 8,
-                          background: "#3b82f6",
-                          borderColor: "#3b82f6",
-                        }}
-                        onClick={() => setModalOpen(true)}
-                      >
-                        Edit Profile
-                      </Button>
-                    </Space>
                   </div>
 
                   <div
@@ -579,16 +447,14 @@ function HelpingHouseDashboard() {
                       //   },
                       {
                         icon: <EnvironmentOutlined />,
-                        text:
-                          getHelpingHouseDashboardData?.data?.profile
-                            ?.address || "",
+                        text: getHelpingHouseByIdData?.address || "",
                         color: "#3b82f6",
                       },
-                      //   {
-                      //     icon: <TeamOutlined />,
-                      //     text: "1,248 Volunteers",
-                      //     color: "#10b981",
-                      //   },
+                    //   {
+                    //     icon: <TeamOutlined />,
+                    //     text: "1,248 Volunteers",
+                    //     color: "#10b981",
+                    //   },
                     ].map((badge, i) => (
                       <div
                         key={i}
@@ -631,15 +497,9 @@ function HelpingHouseDashboard() {
                     }}
                   >
                     {expanded
-                      ? getHelpingHouseDashboardData?.data?.profile?.description
-                      : getHelpingHouseDashboardData?.data?.profile?.description
-                            ?.length > 150
-                        ? getHelpingHouseDashboardData.data.profile.description.slice(
-                            0,
-                            150,
-                          ) + "..."
-                        : getHelpingHouseDashboardData?.data?.profile
-                            ?.description || ""}
+                      ? getHelpingHouseByIdData?.description || ""
+                      : getHelpingHouseByIdData?.description ? getHelpingHouseByIdData?.description?.substring(0, 200) + "..." : ""}
+
                   </Paragraph>
                   <Link
                     onClick={() => setExpanded(!expanded)}
@@ -669,30 +529,22 @@ function HelpingHouseDashboard() {
                       {
                         icon: <EnvironmentOutlined />,
                         label: "Address",
-                        value:
-                          getHelpingHouseDashboardData?.data?.profile
-                            ?.address || "",
+                        value: getHelpingHouseByIdData?.address || "",
                       },
                       {
                         icon: <PhoneOutlined />,
                         label: "Phone",
-                        value:
-                          getHelpingHouseDashboardData?.data?.profile?.phone ||
-                          "",
+                        value: getHelpingHouseByIdData?.phone || "",
                       },
                       {
                         icon: <MailOutlined />,
                         label: "Email",
-                        value:
-                          getHelpingHouseDashboardData?.data?.profile?.email ||
-                          "",
+                        value: getHelpingHouseByIdData?.email || "",
                       },
                       {
                         icon: <GlobalOutlined />,
                         label: "Website",
-                        value:
-                          getHelpingHouseDashboardData?.data?.profile
-                            ?.website || "",
+                        value: getHelpingHouseByIdData?.website || "",
                         link: true,
                       },
                     ].map((c, i) => (
@@ -893,7 +745,7 @@ function HelpingHouseDashboard() {
                     <Title level={5} style={{ margin: 0, color: "#1e3a5f" }}>
                       Key Personnel
                     </Title>
-                    <Button
+                    {/* <Button
                       size="small"
                       icon={<PlusOutlined />}
                       style={{
@@ -901,32 +753,30 @@ function HelpingHouseDashboard() {
                         borderColor: "#dbeafe",
                         color: "#3b82f6",
                       }}
-                      onClick={() => setPersonModalOpen(true)}
                     >
                       Add
-                    </Button>
+                    </Button> */}
                   </div>
                   <Space
                     direction="vertical"
                     style={{ width: "100%" }}
                     size={16}
                   >
-                    {persons.length > 0 &&
-                      persons.map((p, idx) => (
-                        <div
-                          key={p.id || p.name || idx}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 12,
-                            padding: "12px 14px",
-                            borderRadius: 14,
-                            background: "#f8fafc",
-                            border: "1px solid #e2e8f0",
-                            transition: "box-shadow 0.2s",
-                          }}
-                        >
-                          {/* <Badge
+                    {getHelpingHouseByIdData?.helpingHousePersons?.map((p) => (
+                      <div
+                        key={p.name}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: "12px 14px",
+                          borderRadius: 14,
+                          background: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                          transition: "box-shadow 0.2s",
+                        }}
+                      >
+                        {/* <Badge
                           dot
                           color={
                             p.status === "online"
@@ -946,66 +796,49 @@ function HelpingHouseDashboard() {
                             }}
                           />
                         </Badge> */}
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <Text
-                              strong
-                              style={{
-                                color: "#1e3a5f",
-                                display: "block",
-                                fontSize: 14,
-                              }}
-                            >
-                              {p.name}
-                            </Text>
-                            <Text style={{ color: "#64748b", fontSize: 12 }}>
-                              {p.role}
-                            </Text>
-                          </div>
-                          <Space size={6}>
-                            <Tooltip title={p.phone}>
-                              <Button
-                                size="small"
-                                shape="circle"
-                                icon={<PhoneOutlined />}
-                                style={{
-                                  background: "#eff6ff",
-                                  border: "1px solid #bfdbfe",
-                                  color: "#3b82f6",
-                                }}
-                              />
-                            </Tooltip>
-                            <Tooltip title={p.email}>
-                              <Button
-                                size="small"
-                                shape="circle"
-                                icon={<MailOutlined />}
-                                style={{
-                                  background: "#eff6ff",
-                                  border: "1px solid #bfdbfe",
-                                  color: "#3b82f6",
-                                }}
-                              />
-                            </Tooltip>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <Text
+                            strong
+                            style={{
+                              color: "#1e3a5f",
+                              display: "block",
+                              fontSize: 14,
+                            }}
+                          >
+                            {p.name}
+                          </Text>
+                          <Text style={{ color: "#64748b", fontSize: 12 }}>
+                            {p.role}
+                          </Text>
+                        </div>
+                        <Space size={6}>
+                          <Tooltip title={p.phone}>
                             <Button
                               size="small"
-                              icon={<DeleteOutlined />}
+                              shape="circle"
+                              icon={<PhoneOutlined />}
                               style={{
-                                borderRadius: 8,
-                                borderColor: "#dbeafe",
-                                color: "#e52e37",
+                                background: "#eff6ff",
+                                border: "1px solid #bfdbfe",
+                                color: "#3b82f6",
                               }}
-                              onClick={() => handleDeletePerson(p.id)}
-                            >
-                              Delete
-                            </Button>
-                          </Space>
-                        </div>
-                      ))}
-                    {persons.length === 0 && (
-                      <Text style={{ color: "#94a3b8" }}>
-                        No personnel added yet
-                      </Text>
-                    )}
+                            />
+                          </Tooltip>
+                          <Tooltip title={p.email}>
+                            <Button
+                              size="small"
+                              shape="circle"
+                              icon={<MailOutlined />}
+                              style={{
+                                background: "#eff6ff",
+                                border: "1px solid #bfdbfe",
+                                color: "#3b82f6",
+                              }}
+                            />
+                          </Tooltip>
+                        </Space>
+                      </div>
+                    ))}
                   </Space>
                 </Card>
 
@@ -1260,11 +1093,11 @@ function HelpingHouseDashboard() {
       <Modal
         title="Edit Organization Profile"
         open={modalOpen}
-        onOk={handleUpdateProfile}
-        onCancel={() => {
+        onOk={() => {
           setModalOpen(false);
-          editProfileForm.resetFields();
+          openNotif();
         }}
+        onCancel={() => setModalOpen(false)}
         okText="Save Changes"
         okButtonProps={{
           style: {
@@ -1278,94 +1111,57 @@ function HelpingHouseDashboard() {
       >
         <Tabs defaultActiveKey="1">
           <TabPane tab="Organization Info" key="1">
-            <Form
-              form={editProfileForm}
-              layout="vertical"
-              style={{ marginTop: 16 }}
-            >
-              <Form.Item
-                name="name"
-                label="Organization Name"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please enter the organization name",
-                  },
-                ]}
-              >
-                <Input style={{ borderRadius: 8 }} />
+            <Form layout="vertical" style={{ marginTop: 16 }}>
+              <Form.Item label="Organization Name">
+                <Input
+                  defaultValue={userData?.name || ""}
+                  style={{ borderRadius: 8 }}
+                />
               </Form.Item>
-              <Form.Item
-                name="ngoName"
-                label="NGO Name"
-                rules={[
-                  { required: true, message: "Please enter the NGO name" },
-                ]}
-              >
-                <Input style={{ borderRadius: 8 }} />
-              </Form.Item>
-              <Form.Item
-                name="description"
-                label="Description"
-                // rules={[
-                //   { required: true, message: "Please enter the NGO name" },
-                // ]}
-              >
-                <Input style={{ borderRadius: 8 }} />
+              <Form.Item label="NGO Name">
+                <Input
+                  defaultValue={userData?.ngoName || ""}
+                  style={{ borderRadius: 8 }}
+                />
               </Form.Item>
               <Row gutter={16}>
                 <Col span={12}>
-                  <Form.Item
-                    name="phone"
-                    label="Phone"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter the phone number",
-                      },
-                    ]}
-                  >
-                    <Input style={{ borderRadius: 8 }} />
+                  <Form.Item label="Phone">
+                    <Input
+                      defaultValue={userData?.phone || ""}
+                      style={{ borderRadius: 8 }}
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="email"
-                    label="Email"
-                    rules={[
-                      { required: true, message: "Please enter the email" },
-                      { type: "email", message: "Please enter a valid email" },
-                    ]}
-                  >
-                    <Input style={{ borderRadius: 8 }} />
+                  <Form.Item label="Email">
+                    <Input
+                      defaultValue={userData?.email || ""}
+                      style={{ borderRadius: 8 }}
+                    />
                   </Form.Item>
                 </Col>
               </Row>
-              <Form.Item
-                name="address"
-                label="Address"
-                rules={[
-                  { required: true, message: "Please enter the address" },
-                ]}
-              >
-                <Input style={{ borderRadius: 8 }} />
-              </Form.Item>
-              <Form.Item name="website" label="Website">
+              <Form.Item label="Address">
                 <Input
+                  defaultValue={userData?.address || ""}
+                  style={{ borderRadius: 8 }}
+                />
+              </Form.Item>
+              <Form.Item label="Website">
+                <Input
+                  defaultValue={userData?.website || ""}
                   placeholder="https://example.com"
                   style={{ borderRadius: 8 }}
                 />
               </Form.Item>
               <Row gutter={16}>
                 <Col span={12}>
-                  <Form.Item
-                    name="ngoType"
-                    label="NGO Type"
-                    rules={[
-                      { required: true, message: "Please select the NGO type" },
-                    ]}
-                  >
-                    <Select style={{ borderRadius: 8 }}>
+                  <Form.Item label="NGO Type">
+                    <Select
+                      defaultValue={userData?.ngoType || ""}
+                      style={{ borderRadius: 8 }}
+                    >
                       <Select.Option value="charity">Charity</Select.Option>
                       <Select.Option value="foundation">
                         Foundation
@@ -1376,14 +1172,11 @@ function HelpingHouseDashboard() {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  <Form.Item
-                    name="status"
-                    label="Status"
-                    rules={[
-                      { required: true, message: "Please select a status" },
-                    ]}
-                  >
-                    <Select style={{ borderRadius: 8 }}>
+                  <Form.Item label="Status">
+                    <Select
+                      defaultValue={userData?.isActive ? "active" : "inactive"}
+                      style={{ borderRadius: 8 }}
+                    >
                       <Select.Option value="active">Active</Select.Option>
                       <Select.Option value="inactive">Inactive</Select.Option>
                     </Select>
@@ -1392,77 +1185,94 @@ function HelpingHouseDashboard() {
               </Row>
             </Form>
           </TabPane>
+          <TabPane tab="Personnel" key="2">
+            <div style={{ marginTop: 16 }}>
+              <Space direction="vertical" style={{ width: "100%" }} size={12}>
+                {userData?.helpingHousePersons?.length > 0 ? (
+                  userData.helpingHousePersons.map((person, idx) => (
+                    <Card
+                      key={idx}
+                      size="small"
+                      style={{
+                        borderRadius: 8,
+                        border: "1px solid #dbeafe",
+                        background: "#f8fafc",
+                      }}
+                    >
+                      <Row gutter={16}>
+                        <Col span={12}>
+                          <Text
+                            style={{
+                              display: "block",
+                              color: "#64748b",
+                              fontSize: 11,
+                            }}
+                          >
+                            Name
+                          </Text>
+                          <Text strong style={{ fontSize: 13 }}>
+                            {person.name}
+                          </Text>
+                        </Col>
+                        <Col span={12}>
+                          <Text
+                            style={{
+                              display: "block",
+                              color: "#64748b",
+                              fontSize: 11,
+                            }}
+                          >
+                            Role
+                          </Text>
+                          <Text strong style={{ fontSize: 13 }}>
+                            {person.role}
+                          </Text>
+                        </Col>
+                      </Row>
+                      <Row gutter={16} style={{ marginTop: 8 }}>
+                        <Col span={12}>
+                          <Text
+                            style={{
+                              display: "block",
+                              color: "#64748b",
+                              fontSize: 11,
+                            }}
+                          >
+                            Phone
+                          </Text>
+                          <Text style={{ fontSize: 13, color: "#374151" }}>
+                            {person.phone}
+                          </Text>
+                        </Col>
+                        <Col span={12}>
+                          <Text
+                            style={{
+                              display: "block",
+                              color: "#64748b",
+                              fontSize: 11,
+                            }}
+                          >
+                            Email
+                          </Text>
+                          <Text style={{ fontSize: 13, color: "#374151" }}>
+                            {person.email}
+                          </Text>
+                        </Col>
+                      </Row>
+                    </Card>
+                  ))
+                ) : (
+                  <Text style={{ color: "#94a3b8" }}>
+                    No personnel added yet
+                  </Text>
+                )}
+              </Space>
+            </div>
+          </TabPane>
         </Tabs>
-      </Modal>
-      <Modal
-        title="Add New Person"
-        open={personModalOpen}
-        onOk={() => handleSubmitPerson()}
-        onCancel={() => {
-          personForm.resetFields();
-          setPersonModalOpen(false);
-        }}
-        okText="Add Person"
-        okButtonProps={{
-          style: {
-            background: "#3b82f6",
-            borderColor: "#3b82f6",
-            borderRadius: 8,
-          },
-        }}
-        cancelButtonProps={{ style: { borderRadius: 8 } }}
-        width={520}
-      >
-        <Form form={personForm} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[{ required: true, message: "Please enter a name" }]}
-          >
-            <Input placeholder="John Doe" style={{ borderRadius: 8 }} />
-          </Form.Item>
-          <Form.Item
-            name="role"
-            label="Role"
-            rules={[{ required: true, message: "Please enter a role" }]}
-          >
-            <Input placeholder="Program Lead" style={{ borderRadius: 8 }} />
-          </Form.Item>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="phone"
-                label="Phone"
-                rules={[
-                  { required: true, message: "Please enter a phone number" },
-                ]}
-              >
-                <Input
-                  placeholder="+1 800 555 0100"
-                  style={{ borderRadius: 8 }}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="email"
-                label="Email"
-                rules={[
-                  { required: true, message: "Please enter an email" },
-                  { type: "email", message: "Enter a valid email address" },
-                ]}
-              >
-                <Input
-                  placeholder="john@example.com"
-                  style={{ borderRadius: 8 }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
       </Modal>
     </Layout>
   );
 }
 
-export default HelpingHouseDashboard;
+export default HelpingHouse;

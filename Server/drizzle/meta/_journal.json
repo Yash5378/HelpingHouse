@@ -78,6 +78,34 @@
       "when": 1772899261452,
       "tag": "0010_faulty_shooting_star",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1774192438365,
+      "tag": "0011_sticky_warhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1774192489474,
+      "tag": "0012_marvelous_wonder_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1774192547079,
+      "tag": "0013_powerful_shadowcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1775043467031,
+      "tag": "0014_mature_green_goblin",
+      "breakpoints": true
     }
   ]
 }

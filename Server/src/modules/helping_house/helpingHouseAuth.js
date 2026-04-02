@@ -26,6 +26,7 @@ export const SignupHelpingHouse = async ({
   password,
   website,
   ngoType,
+  ngoName,
   // ngoCertificateBuffer,
   // ngoCertificateFileName,
   // ngoCertificateMimeType,
@@ -76,6 +77,7 @@ export const SignupHelpingHouse = async ({
         phone,
         website,
         ngoType,
+        ngoName,
         // ngoCertificateUrl: certificateUrl,
         isActive: true,
       })
@@ -86,6 +88,7 @@ export const SignupHelpingHouse = async ({
         address: helpingHouse.address,
         phone: helpingHouse.phone,
         website: helpingHouse.website,
+        ngoName: helpingHouse.ngoName,
         // ngoCertificateUrl: helpingHouse.ngoCertificateUrl,
       });
 
@@ -97,12 +100,12 @@ export const SignupHelpingHouse = async ({
       error.message.includes("client password must be a string")
     ) {
       throw new Error(
-        "Database connection error: The password in DATABASE_URL must be a string. Please check your .env file and ensure the password is properly formatted. If your password contains special characters, make sure they are URL-encoded."
+        "Database connection error: The password in DATABASE_URL must be a string. Please check your .env file and ensure the password is properly formatted. If your password contains special characters, make sure they are URL-encoded.",
       );
     }
     if (error.code === "42P01") {
       throw new Error(
-        "Database table 'helpingHouse' does not exist. Please run migrations using: npm run db:push"
+        "Database table 'helpingHouse' does not exist. Please run migrations using: npm run db:push",
       );
     }
     if (error.code === "23505") {
@@ -110,7 +113,7 @@ export const SignupHelpingHouse = async ({
     }
     if (error.code === "ECONNREFUSED" || error.message?.includes("connect")) {
       throw new Error(
-        "Cannot connect to database. Please ensure PostgreSQL is running and DATABASE_URL is correct."
+        "Cannot connect to database. Please ensure PostgreSQL is running and DATABASE_URL is correct.",
       );
     }
     throw error;
@@ -139,7 +142,7 @@ export const SigninHelpingHouse = async ({ email, password }) => {
     // Validate password
     const validatePassword = await bcrypt.compare(
       password,
-      existingUser.passwordHash
+      existingUser.passwordHash,
     );
 
     if (!validatePassword) {
@@ -148,7 +151,7 @@ export const SigninHelpingHouse = async ({ email, password }) => {
     const token = jwt.sign(
       { id: existingUser.id, role: "helping_house" },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      { expiresIn: process.env.JWT_EXPIRES_IN },
     );
 
     return token;
@@ -159,17 +162,17 @@ export const SigninHelpingHouse = async ({ email, password }) => {
       error.message.includes("client password must be a string")
     ) {
       throw new Error(
-        "Database connection error: The password in DATABASE_URL must be a string. Please check your .env file and ensure the password is properly formatted. If your password contains special characters, make sure they are URL-encoded."
+        "Database connection error: The password in DATABASE_URL must be a string. Please check your .env file and ensure the password is properly formatted. If your password contains special characters, make sure they are URL-encoded.",
       );
     }
     if (error.code === "42P01") {
       throw new Error(
-        "Database table 'helpingHouse' does not exist. Please run migrations using: npm run db:push"
+        "Database table 'helpingHouse' does not exist. Please run migrations using: npm run db:push",
       );
     }
     if (error.code === "ECONNREFUSED" || error.message?.includes("connect")) {
       throw new Error(
-        "Cannot connect to database. Please ensure PostgreSQL is running and DATABASE_URL is correct."
+        "Cannot connect to database. Please ensure PostgreSQL is running and DATABASE_URL is correct.",
       );
     }
     throw error;

@@ -3,7 +3,10 @@ import dotenv from "dotenv";
 import cors from "cors";
 import router from "./routes/donerRoutes.js";
 import helpingHouseRouter from "./routes/helpingHouseRoutes.js";
-import { unifiedSigninHandler } from "./controllers/unifiedAuthController.js";
+import {
+  unifiedSigninHandler,
+  unifiedOAuthSigninHandler,
+} from "./controllers/unifiedAuthController.js";
 
 dotenv.config();
 
@@ -26,6 +29,7 @@ app.use(express.json());
 
 // Unified sign-in endpoint for both doners and helping houses
 app.post("/signin", unifiedSigninHandler);
+app.post("/oauth", unifiedOAuthSigninHandler);
 
 // Existing routes
 app.use("/", router);
