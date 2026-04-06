@@ -25,7 +25,7 @@ const ACCOUNT_TYPES = [
   },
 ];
 
-export default function Signup() {
+ function Signup() {
   const [selectedType, setSelectedType] = useState(null);
   const [searchParams] = useSearchParams();
 
@@ -128,3 +128,6 @@ export default function Signup() {
     </Flex>
   );
 }
+
+
+export default Signup;

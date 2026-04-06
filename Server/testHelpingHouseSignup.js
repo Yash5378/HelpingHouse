@@ -2,7 +2,7 @@
 import fetch from "node-fetch";
 
 const testHelpingHouseSignup = async () => {
-  console.log("🧪 Testing Helping House Signup (without certificate)");
+  console.log('Testing Helping House Signup (without certificate)');
   console.log("====================================================\n");
 
   const testData = {
@@ -33,23 +33,23 @@ const testHelpingHouseSignup = async () => {
 
     const data = await response.json();
 
-    console.log(`\n📊 Response Status: ${response.status}`);
+    console.log(`\n Response Status: ${response.status}`);
 
     if (response.ok) {
-      console.log("✅ Signup Successful!");
-      console.log("📋 Response Data:");
+      console.log("Signup Successful!");
+      console.log(" Response Data:");
       console.log(JSON.stringify(data, null, 2));
     } else {
-      console.log("❌ Signup Failed!");
-      console.log("📋 Error Response:");
+      console.log(" Signup Failed!");
+      console.log(" Error Response:");
       console.log(JSON.stringify(data, null, 2));
     }
   } catch (error) {
-    console.log("❌ Network Error:");
+    console.log(" Network Error:");
     console.log(error.message);
   }
 
-  console.log("\n🎯 Test completed!");
+  console.log("\n Test completed!");
 };
 
 // Run the test

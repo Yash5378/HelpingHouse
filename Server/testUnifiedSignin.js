@@ -1,8 +1,6 @@
-// Test script for unified sign-in API
-// This demonstrates how the new unified sign-in endpoint works
 
 const testUnifiedSignin = async () => {
-  console.log("🧪 Testing Unified Sign-in API");
+
   console.log("===============================\n");
 
   // Test cases
@@ -38,8 +36,7 @@ const testUnifiedSignin = async () => {
   console.log("🎯 Response: { success, token, user, userType, message }\n");
 
   for (const testCase of testCases) {
-    console.log(`🔍 Testing: ${testCase.name}`);
-    console.log(`   Email: ${testCase.email}`);
+ 
 
     try {
       const response = await fetch("http://localhost:3000/signin", {
@@ -56,17 +53,17 @@ const testUnifiedSignin = async () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log(`   ✅ Success: ${data.userType} authenticated`);
-        console.log(`   👤 User: ${data.user.name} (${data.user.email})`);
-        console.log(`   🔑 Token: ${data.token.substring(0, 20)}...`);
+        console.log(`  Success: ${data.userType} authenticated`);
+        console.log(`  User: ${data.user.name} (${data.user.email})`);
+        console.log(` Token: ${data.token.substring(0, 20)}...`);
       } else {
-        console.log(`   ❌ Error: ${data.message}`);
+        console.log(` Error: ${data.message}`);
       }
     } catch (error) {
-      console.log(`   ❌ Network Error: ${error.message}`);
+      console.log(`  Network Error: ${error.message}`);
     }
 
-    console.log(""); // Empty line between tests
+    console.log("");
   }
 
   console.log("🎉 Test completed!");
