@@ -11,7 +11,7 @@ services:
       - app-network
 
   backend:
-    image: yash2244/helperhouse-backend:latest   # 👈 change yash5378 to your username
+    image: yash2244/helperhouse-backend:latest # 👈 change yash5378 to your username
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -25,7 +25,7 @@ services:
       - app-network
 
   frontend:
-    image: yash2244/helperhouse-frontend:latest   # 👈 change yash2244 to your username
+    image: yash2244/helperhouse-frontend:latest # 👈 change yash2244 to your username
     build:
       context: ../../HelpingHouse
       dockerfile: Dockerfile
