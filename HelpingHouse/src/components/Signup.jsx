@@ -3,8 +3,9 @@ import { Card, Flex, Typography, Space } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 import { Link, useSearchParams } from "react-router-dom";
 import "../Style/Auth.css";
+import DonorSignupForm from "./DonorsignupForm";
 import HelpingHouseSignupForm from "./HelpingHouseSignupForm";
-import DonorSignupForm from "./Donorsignupform ";
+
 
 const { Title, Text } = Typography;
 
