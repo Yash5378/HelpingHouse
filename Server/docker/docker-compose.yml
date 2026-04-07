@@ -28,7 +28,7 @@ services:
   frontend:
     build:
       context: ../../HelpingHouse
-      dockerfile: HelpingHouse/Dockerfile
+      dockerfile: Dockerfile
       args:
         VITE_BASE_URL: ${VITE_BASE_URL}
     container_name: my_frontend
