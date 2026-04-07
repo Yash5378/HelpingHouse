@@ -15,7 +15,7 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Stage 2: Production
+# Stage 2: Production  
 FROM nginx:alpine
 
 # Copy nginx configuration
