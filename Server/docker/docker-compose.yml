@@ -30,7 +30,7 @@ services:
       context: ../../HelpingHouse
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL}
+        VITE_BASE_URL: ${VITE_BASE_URL}
     container_name: my_frontend
     restart: always
     ports:
