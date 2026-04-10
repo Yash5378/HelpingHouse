@@ -4,31 +4,31 @@ services:
     container_name: my_postgres
     restart: always
     env_file:
-      - ../.env
+      - .env
     volumes:
       - pg_data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
-    image: yash2244/helperhouse-backend:latest # 👈 change yash5378 to your username
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: ${DOCKER_USERNAME}/helperhouse-backend:latest
     container_name: my_backend
     restart: always
     env_file:
-      - ../.env
+      - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - app-network
 
   frontend:
-    image: yash2244/helperhouse-frontend:latest # 👈 change yash2244 to your username
-    build:
-      context: ../../HelpingHouse
-      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME}/helperhouse-frontend:latest
     container_name: my_frontend
     restart: always
     ports:
