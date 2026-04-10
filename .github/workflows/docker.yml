@@ -41,7 +41,7 @@ jobs:
       - name: Deploy with Docker Compose
         run: |
           cd ~/app
-          docker compose up -d --remove-orphans --force-recreate
+          docker-compose up -d --remove-orphans --force-recreate
           docker image prune -f
 
       - name: Run database migrations
