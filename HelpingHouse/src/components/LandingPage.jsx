@@ -1342,58 +1342,7 @@ export default function LandingPage() {
         {/* ══════════════════════════════════════════════════
             PARTNERS
         ══════════════════════════════════════════════════ */}
-        <section
-          style={{
-            background: "white",
-            padding: "48px 40px",
-            borderTop: "1px solid #f1f5f9",
-          }}
-        >
-          <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-            <Text
-              style={{
-                color: "#94a3b8",
-                fontSize: 12,
-                fontWeight: 600,
-                letterSpacing: 1.5,
-                textTransform: "uppercase",
-                display: "block",
-                textAlign: "center",
-                marginBottom: 28,
-              }}
-            >
-              Trusted & Partnered With
-            </Text>
-            <div
-              style={{
-                display: "flex",
-                gap: 12,
-                justifyContent: "center",
-                flexWrap: "wrap",
-              }}
-            >
-              {partners.map((p, i) => (
-                <div
-                  key={i}
-                  className="lp-partner-chip"
-                  style={{
-                    background: "#f8fafc",
-                    border: "1.5px solid #e2e8f0",
-                    borderRadius: 12,
-                    padding: "10px 24px",
-                    color: "#64748b",
-                    fontWeight: 700,
-                    fontSize: 13,
-                    letterSpacing: 0.3,
-                  }}
-                >
-                  {p}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
+      
         {/* ══════════════════════════════════════════════════
             FOOTER
         ══════════════════════════════════════════════════ */}
