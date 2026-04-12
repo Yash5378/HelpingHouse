@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import {
   Form,
   Input,
@@ -59,28 +58,9 @@ export default function HelpingHouseSignupForm({ onBack }) {
       });
       console.log("Registration response:", res);
       if (res?.status_code === 201) {
-        try {
-          const apiBase =
-            import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-          const loginResponse = await axios.post(`${apiBase}/signin`, {
-            email: values.email,
-            password: values.password,
-          });
-
-          const loginData = loginResponse.data;
-          if (loginData?.status_code === 200 && loginData?.token) {
-            localStorage.setItem("userData", JSON.stringify(loginData));
-            message.success("Account created! Redirecting to dashboard...");
-            navigate("/dashboard");
-          } else {
-            message.success("Account created! Please sign in to continue.");
-            navigate("/login");
-          }
-        } catch (loginError) {
-          console.error("Auto-login failed:", loginError);
-          message.success("Account created! Please sign in to continue.");
-          navigate("/login");
-        }
+        localStorage.setItem("userData", JSON.stringify(res));
+        message.success("Account created! Redirecting to dashboard...");
+        navigate("/dashboard");
       } else {
         message.error(res?.error || "Registration failed. Please try again.");
       }

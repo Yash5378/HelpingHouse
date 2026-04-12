@@ -34,9 +34,13 @@ export const SignupDoner = async ({ name, email, password }) => {
         email: doner.email,
       });
 
-    console.log(newDoner);
+    const token = jwt.sign(
+      { id: newDoner.id, role: "doner" },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
 
-    return newDoner;
+    return { token, user: { ...newDoner, role: "doner" }, userType: "doner" };
   } catch (error) {
     // Check if it's a PostgreSQL authentication error
     if (

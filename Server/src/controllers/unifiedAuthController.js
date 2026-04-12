@@ -227,8 +227,11 @@ export const unifiedOAuthSigninHandler = async (req, res) => {
 };
 
 export const unifiedSigninHandler = async (req, res) => {
+
   try {
     const { email, password } = req.body;
+    console.log("email",email)
+    console.log("pass--", password)
 
     if (!email || !password) {
       return res.status(400).json({

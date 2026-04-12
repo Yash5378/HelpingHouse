@@ -39,7 +39,7 @@ export default function App() {
           <Content>
             <Routes>
               <Route path="/landing" element={<LandingPage />} />
-              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<Navigate to="/landing" replace />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
 
@@ -50,7 +50,7 @@ export default function App() {
                 <Route path="/:id" element={<HelpingHouse />} />
               </Route>
 
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              <Route path="*" element={<Navigate to="/landing" replace />} />
             </Routes>
           </Content>
         </Layout>

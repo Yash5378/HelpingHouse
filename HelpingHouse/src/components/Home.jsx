@@ -263,7 +263,7 @@ const HOUSE_TYPE_IMAGES = {
   cat_shelter:
     "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&w=1200&q=80",
   children_house:
-    "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=80",
   elder_care:
     "https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?auto=format&fit=crop&w=1200&q=80",
   women_shelter:
@@ -348,6 +348,9 @@ function HouseCard({ house, viewMode, onFavorite, isFavorite, onView }) {
             (e.currentTarget.style.transform = "scale(1.06)")
           }
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          onError={(e) => {
+            e.currentTarget.src = HOUSE_TYPE_IMAGES.default;
+          }}
         />
         {/* Gradient overlay */}
         <div

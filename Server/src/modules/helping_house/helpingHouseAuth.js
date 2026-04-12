@@ -4,6 +4,7 @@ import { helpingHouse } from "../../db/schema/helpingHouseSchema.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+
 /**
  * Register a new helping house
  * @param {Object} data - Registration data
@@ -89,10 +90,19 @@ export const SignupHelpingHouse = async ({
         phone: helpingHouse.phone,
         website: helpingHouse.website,
         ngoName: helpingHouse.ngoName,
-        // ngoCertificateUrl: helpingHouse.ngoCertificateUrl,
       });
 
-    return newHelpingHouse;
+    const token = jwt.sign(
+      { id: newHelpingHouse.id, role: "helping_house" },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    return {
+      token,
+      user: { ...newHelpingHouse, role: "helping_house" },
+      userType: "helping_house",
+    };
   } catch (error) {
     // Handle database errors
     if (

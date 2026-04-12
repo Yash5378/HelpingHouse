@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: helperhouse_postgres_dev
+    restart: always
+    environment:
+      POSTGRES_USER: yash
+      POSTGRES_PASSWORD: pg_pass
+      POSTGRES_DB: app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_dev_data:/var/lib/postgresql/data
+
+volumes:
+  pg_dev_data:

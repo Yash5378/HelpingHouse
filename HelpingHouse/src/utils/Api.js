@@ -1,7 +1,7 @@
 export const baseUrl = import.meta.env.VITE_BASE_URL;
 
-export const DonerLogin = `${baseUrl}/signin`;
-export const SignupDonerUrl = `${baseUrl}/signup_doner`;
+export const DonerLogin = `${baseUrl}/api/signin`;
+export const SignupDonerUrl = `${baseUrl}/api/signup_doner`;
 export const GetAllHelpingHouseUrl = (queryparam) =>
   `${baseUrl}/api/helping_house/all${queryparam ? `?${queryparam}` : ""}`;
 

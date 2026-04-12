@@ -9,10 +9,14 @@ export const Signup = async (req, res) => {
     const { name, email, password } = req.body;
     console.log("Doner Signup:", { name, email, password });
     console.log(name, email, password);
-    const newDoner = await SignupDoner({ name, email, password });
-    res
-      .status(201)
-      .json({ ...newDoner, message: "Signup successful", status_code: 201 });
+    const result = await SignupDoner({ name, email, password });
+    res.status(201).json({
+      token: result.token,
+      user: result.user,
+      userType: result.userType,
+      message: "Signup successful",
+      status_code: 201,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

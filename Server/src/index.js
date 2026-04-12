@@ -28,11 +28,11 @@ app.get("/", (req, res) => {
 app.use(express.json());
 
 // Unified sign-in endpoint for both doners and helping houses
-app.post("/signin", unifiedSigninHandler);
-app.post("/oauth", unifiedOAuthSigninHandler);
+app.post("/api/signin", unifiedSigninHandler);
+app.post("/api/oauth", unifiedOAuthSigninHandler);
 
 // Existing routes
-app.use("/", router);
+app.use("/api", router);
 app.use("/api/helping_house", helpingHouseRouter);
 
 app.listen(PORT, () => {

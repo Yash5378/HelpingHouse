@@ -213,7 +213,9 @@ export const Signup = async (req, res) => {
     });
 
     res.status(201).json({
-      ...newHelpingHouse,
+      token: newHelpingHouse.token,
+      user: newHelpingHouse.user,
+      userType: newHelpingHouse.userType,
       message: "Signup successful",
       status_code: 201,
     });

@@ -29,9 +29,9 @@ export const SignupDoner = (value) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: SIGNUP_DONER.SIGNUP_DONER_FAILURE,
-      payload: response.data,
+      payload: error.response?.data,
     });
-    return response.data;
+    return error.response?.data;
   }
 };
 

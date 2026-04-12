@@ -1,71 +1,28 @@
-import { useState } from "react";
+import { Layout, Button, Space, Typography, Dropdown } from "antd";
 import {
-  Layout,
-  Badge,
-  Button,
-  Avatar,
-  Space,
-  Typography,
-  Dropdown,
-  Tooltip,
-} from "antd";
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  BellOutlined,
-  SettingOutlined,
-  UserOutlined,
-  LogoutOutlined,
-  DownOutlined,
   HomeOutlined,
+  LogoutOutlined,
+  UserOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const { Header } = Layout;
 const { Text } = Typography;
 
-const HeaderComponent = ({
-  navigate = useNavigate(),
-  collapsed = false,
-  onToggle,
-  // user = {
-  //     name: "Sarah Chen",
-  //     role: "Director",
-  //     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-  // },
-  notificationCount = 3,
-  onNotificationClick,
-  onProfileClick,
-  onSettingsClick,
-  onLogout,
-  showNotification = true,
-  showSettings = true,
-}) => {
-  const param = useParams();
+const HeaderComponent = () => {
+  const navigate = useNavigate();
   const location = useLocation();
 
-  console.log("location", location);
-  console.log("param", param);
-
-  const userlogin = useSelector((state) => state?.login?.donerData);
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   const handleLogout = () => {
     localStorage.removeItem("userData");
     navigate("/landing");
   };
 
-  const useData = JSON.parse(localStorage.getItem("userData"));
-  console.log("useData", useData);
   const userMenuItems = [
-    // {
-    //   key: "profile",
-    //   icon: <UserOutlined />,
-    //   label: "My Profile",
-    //   onClick: onProfileClick,
-    // },
-
-    ...(useData?.user?.role === "helping_house"
+    ...(userData?.user?.role === "helping_house"
       ? [
           {
             key: "dashboard",
@@ -75,14 +32,12 @@ const HeaderComponent = ({
           },
         ]
       : []),
-
     { type: "divider" },
-
     {
       key: "logout",
       icon: <LogoutOutlined />,
       label: <Text style={{ color: "#ef4444" }}>Logout</Text>,
-      onClick: () => handleLogout(),
+      onClick: handleLogout,
     },
   ];
 
@@ -102,67 +57,64 @@ const HeaderComponent = ({
         lineHeight: "normal",
       }}
     >
-      {/* Left: Hamburger only */}
+      {/* Logo */}
       <Space
-        size={16}
+        size={12}
         align="center"
-        style={{ cursor: "pointer " }}
+        style={{ cursor: "pointer" }}
         onClick={() => navigate("/home")}
       >
         <div
           style={{
             width: 40,
             height: 40,
-            background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+            background: "linear-gradient(135deg, #1a6b45, #155237)",
             borderRadius: 10,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
-            boxShadow: "0 4px 12px rgba(59,130,246,0.5)",
+            boxShadow: "0 4px 12px rgba(26,107,69,0.4)",
           }}
         >
           <HomeOutlined style={{ fontSize: 18, color: "white" }} />
         </div>
-        <Text>Helping House</Text>
+        <Text style={{ fontWeight: 700, color: "#1a6b45", fontSize: 15 }}>
+          Helping House
+        </Text>
       </Space>
 
+      {/* Right side */}
       {location.pathname === "/landing" ? (
-        <Button onClick={() => navigate("/signup")}>SignUp</Button>
+        <Button
+          type="primary"
+          onClick={() => navigate("/signup")}
+          style={{ borderRadius: 8, fontWeight: 600 }}
+        >
+          Sign Up
+        </Button>
       ) : (
-        <Space size={12} align="center">
-          <div
+        <Dropdown
+          menu={{ items: userMenuItems }}
+          trigger={["click"]}
+          placement="bottomRight"
+        >
+          <Space
             style={{
-              width: 1,
-              height: 32,
-              background: "#e5e7eb",
+              cursor: "pointer",
+              padding: "6px 10px",
+              borderRadius: 10,
+              border: "1px solid #e5e7eb",
+              background: "#f9fafb",
             }}
-          />
-
-          <Dropdown
-            menu={{ items: userMenuItems }}
-            trigger={["click"]}
-            placement="bottomRight"
+            size={8}
           >
-            <Space
-              style={{
-                cursor: "pointer",
-                padding: "6px 10px",
-                borderRadius: 10,
-                border: "1px solid #e5e7eb",
-                background: "#f9fafb",
-              }}
-              size={8}
-            >
-              <div>
-                <Text strong style={{ fontSize: 13 }}>
-                  {useData?.user?.name}
-                </Text>
-              </div>
-              <DownOutlined style={{ fontSize: 10 }} />
-            </Space>
-          </Dropdown>
-        </Space>
+            <Text strong style={{ fontSize: 13 }}>
+              {userData?.user?.name}
+            </Text>
+            <DownOutlined style={{ fontSize: 10 }} />
+          </Space>
+        </Dropdown>
       )}
     </Header>
   );
